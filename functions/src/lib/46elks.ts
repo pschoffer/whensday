@@ -15,7 +15,7 @@ export const sendWeNeedYourHelpSMS = async (user: User) => {
 
 export const sendWelcomeSMS = async (user: User) => {
     logger.info("Sending welcome SMS to", { user });
-    const message = WELCOME_SMS.replace("{name}", user.name),
+    const message = WELCOME_SMS.replace("{name}", user.name);
 
     return sendSMS(user, message);
 }
@@ -23,7 +23,7 @@ export const sendWelcomeSMS = async (user: User) => {
 
 export const sendSMS = async (user: User, message: string) => {
     const dataObject = {
-        from: "Whensday",
+        from: "+46766866523",
         to: user.phone,
         message,
     }

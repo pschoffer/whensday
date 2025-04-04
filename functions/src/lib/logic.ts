@@ -4,6 +4,21 @@ import { User } from '../models/User';
 import { logger } from 'firebase-functions';
 import { sendWeNeedYourHelpSMS } from './46elks';
 
+
+export const processReply = async (number: string, message: string) => {
+    const findUserSnap = await admin.firestore().collection("users").where("phone", "==", number).get();
+    if (findUserSnap.empty) {
+        logger.info("User not found", { number });
+        return;
+    }
+    const user = fromFirebaseDoc<User>(findUserSnap.docs[0]);
+
+    const userUpdate: Partial<User> = {
+        working: message.toLowerCase() === "yes",
+    }
+    await admin.firestore().collection("users").doc(user.id).update(userUpdate);
+};
+
 export const ensureEnoughStaff = async () => {
     const configSnap = await admin.firestore().collection("config").doc("public").get();
     const requiredStaffCount = configSnap.data()?.requiredStaffCount || 0;
