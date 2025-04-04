@@ -1,64 +1,25 @@
 import React, { useState } from 'react';
 
 import './App.css';
-import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import SignUpPage from './pages/SignUpPage';
+import AdminPage from './pages/AdminPage';
 
 
 
 function App() {
-  // Store Phone number
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [error, setError] = useState('');
+  const isAdmin = window.location.pathname === '/admin';
 
-  // Function that handle input change
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPhoneNumber(event.target.value);
-  };
+  if (isAdmin) {
+    return <AdminPage />
+  }
 
-  const isValidPhoneNumber = (phone: string) => {
-    const phoneRegex = /^\+\d{1,3}\d{10}$/;
-    return phoneRegex.test(phone);
-  };
-  // Function to submit phone number
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (isValidPhoneNumber(phoneNumber)) {
-      alert(`Phone number submitted: ${phoneNumber}`);
-      setPhoneNumber(''); // Clear input field after submission
-      setError('');
-    } else {
-      setError('Invalid phone number. Format: +[Country Code][10-digit number]');
-    } // Clear input field after submission
-  };
-
-  return (
-    <div className="App">
-      <header className="App-header">        
-        
-      <h1>Enter Your Phone Number</h1>
-        <form onSubmit={handleSubmit}>
-          <Form.Control isInvalid={!!error}
-            type="tel" 
-            placeholder="+123456789012" 
-            value={phoneNumber} 
-            onChange={handleInputChange} 
-            required 
-          />
-          {error && <Form.Control.Feedback type="invalid">{error}</Form.Control.Feedback>}
-          
-          <Button type="submit">Submit</Button>
-
-        </form>
-        
-      </header>
-    </div>
-  );
+  return <SignUpPage />
 }
 
 export default App;
 
- 
+
 
 
 
