@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, limit, onSnapshot, query } from 'firebase/firestore';
 import { firestore } from '../lib/firebase';
 
 export default function MessageLog() {
     useEffect(() => {
-        return onSnapshot(collection(firestore, "logs"), (snapshot) => {
+        const q = query(collection(firestore, "logs"), limit(5));
+        return onSnapshot(q, (snapshot) => {
             const changes = snapshot.docChanges();
 
             changes.forEach((change) => {
