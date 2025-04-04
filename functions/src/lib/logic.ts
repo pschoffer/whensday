@@ -4,6 +4,7 @@ import { User } from '../models/User';
 import { logger } from 'firebase-functions';
 import { sendWeCouldntUnderstandSMS, sendWeNeedYourHelpSMS, WE_NEED_YOUR_HELP_SMS } from './46elks';
 import { evaluateReply } from './ai';
+import { LogItem } from '../models/LogItem';
 
 
 export const processReply = async (number: string, message: string) => {
@@ -14,8 +15,14 @@ export const processReply = async (number: string, message: string) => {
     }
     const user = fromFirebaseDoc<User>(findUserSnap.docs[0]);
 
+
     const reply = await evaluateReply(WE_NEED_YOUR_HELP_SMS, message);
     console.log("AI reply", { reply });
+
+    const newLog: Partial<LogItem> = {
+        message: `<- ${user.name}: ${message} <result: ${reply.yes}, score: ${reply.score}>`,
+    }
+    await admin.firestore().collection("logs").add(newLog);
 
     if (reply.score < 50) {
         logger.info("We are not sure what the user means", { message });

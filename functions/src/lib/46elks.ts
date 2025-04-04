@@ -2,7 +2,8 @@ import { logger } from "firebase-functions"
 import axios from "axios"
 import { PASS_46ELKS, USERNAME_46ELKS } from "./secrets";
 import { User } from "../models/User";
-
+import { LogItem } from "../models/LogItem";
+import * as admin from 'firebase-admin';
 
 const WELCOME_SMS = "Welcome to Whensday! Your call sign is {name}.";
 export const WE_NEED_YOUR_HELP_SMS = "PANIC! We need your help {name}, can you work now?";
@@ -22,12 +23,16 @@ export const sendWeNeedYourHelpSMS = async (user: User) => {
 export const sendWelcomeSMS = async (user: User) => {
     logger.info("Sending welcome SMS to", { user });
     const message = WELCOME_SMS.replace("{name}", user.name);
-
     return sendSMS(user, message);
 }
 
 
 export const sendSMS = async (user: User, message: string) => {
+    const newLog: Partial<LogItem> = {
+        message: `-> ${user.name}: ${message}`,
+    }
+    await admin.firestore().collection("logs").add(newLog);
+
     const dataObject = {
         from: "+46766866523",
         to: user.phone,
