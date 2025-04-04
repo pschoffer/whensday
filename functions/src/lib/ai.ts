@@ -24,8 +24,8 @@ export const evaluateReply = async (question: string, answer: string): Promise<R
                     type: "number",
                     description: "Score from 0 to 100 of how certain are you.",
                 },
-            }
-        }
+            },
+        },
     })
 
     logger.info("AI response", { response });
