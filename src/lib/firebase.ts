@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import config from "./config";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBU3nQ04DH26Xhs2BtCjLiuqxPc1VAZI-I",
@@ -14,6 +15,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const firestore = getFirestore(app);
+if (config.useEmulators) {
+    console.log('Using emulators')
+    connectFirestoreEmulator(firestore, 'localhost', 8080);
+}
 
 
 export function toFirebaseDoc<Type>(obj: Type): any {
