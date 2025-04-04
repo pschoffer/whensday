@@ -1,22 +1,17 @@
 import { logger } from "firebase-functions"
 import axios from "axios"
 import { PASS_46ELKS, USERNAME_46ELKS } from "./secrets";
+import { User } from "../models/User";
 
-export const sendWelcomeSMS = async (originalNumber: string) => {
-    let number = originalNumber;
-    if (!originalNumber.startsWith("+")) {
-        number = "+46" + originalNumber;
-    }
-
-
-    logger.info("Sending welcome SMS to", { number });
-
+export const sendWelcomeSMS = async (user: User) => {
+    logger.info("Sending welcome SMS to", { user });
 
     const dataObject = {
-        from: "ElksWelcome",
-        to: number,
-        message: "Highway to hell",
+        from: "Whensday",
+        to: user.phone,
+        message: "Welcome to Whensday! Your call sign is " + user.name + ".",
     }
+
     const data = new URLSearchParams(dataObject);
 
     await axios.post("https://api.46elks.com/a1/sms",
@@ -27,5 +22,5 @@ export const sendWelcomeSMS = async (originalNumber: string) => {
                 password: PASS_46ELKS,
             },
         })
-    logger.info("SMS sent to", { number });
+    logger.info("SMS sent to", { user });
 }

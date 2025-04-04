@@ -11,6 +11,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import { sendWelcomeSMS } from "./lib/46elks";
 import { setGlobalOptions } from "firebase-functions";
 import * as admin from 'firebase-admin';
+import { cleanNumber, ensureUserExists, isValidNumber } from "./lib/logic";
 
 admin.initializeApp();
 
@@ -31,7 +32,9 @@ export const registerNewNumber = onRequest({ cors: true }, async (request, respo
     }
 
     try {
-        await sendWelcomeSMS(number)
+        const cleanedNumber = cleanNumber(number);
+        const user = await ensureUserExists(cleanedNumber);
+        await sendWelcomeSMS(user)
 
         response.send("ok");
     } catch (error) {
@@ -40,8 +43,3 @@ export const registerNewNumber = onRequest({ cors: true }, async (request, respo
     }
 });
 
-const isValidNumber = (number: string) => {
-    number = number.replace(/\s+/g, '').replace(/-/g, '');
-    const regex = /^[+]?\d+$/;
-    return regex.test(number);
-}
