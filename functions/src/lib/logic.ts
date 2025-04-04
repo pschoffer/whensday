@@ -3,9 +3,25 @@ import * as admin from 'firebase-admin';
 import { User } from '../models/User';
 import { logger } from 'firebase-functions';
 import { sendWeCouldntUnderstandSMS, sendWeNeedYourHelpSMS, WE_NEED_YOUR_HELP_SMS } from './46elks';
-import { evaluateReply } from './ai';
+import { evaluatePicture, evaluateReply } from './ai';
 import { LogItem } from '../models/LogItem';
+import { Image } from '../models/Image';
+import { Config } from '../models/Config';
 
+export const processImage = async (imageId: string, imageUrl: string) => {
+    logger.info("Processing image", { imageId, imageUrl });
+
+    const evaluation = await evaluatePicture(imageUrl);
+
+    const imageUpdate: Partial<Image> = {
+        requiredCount: evaluation.numberPeople,
+    }
+    await admin.firestore().collection("images").doc(imageId).update(imageUpdate);
+    const configUpdate: Partial<Config> = {
+        requiredStaffCount: evaluation.numberPeople,
+    }
+    await admin.firestore().collection("config").doc("public").set(configUpdate);
+}
 
 export const processReply = async (number: string, message: string) => {
     const findUserSnap = await admin.firestore().collection("users").where("phone", "==", number).get();

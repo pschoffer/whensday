@@ -45,10 +45,10 @@ export default function ImageProcessor() {
                 <Button onClick={handleNewPicture}>+ Take Picture</Button>
             </div>
 
-            {images.map((image, index) => (
-
-                <div key={index} className='border rounded p-3  d-flex shadow'>
-                    <img src={image.imageUrl} alt={image.fileName} style={{ width: 100, height: 100 }} />
+            {images.map((image) => (
+                <div key={image.imageUrl} className='border rounded p-3  d-flex flex-column shadow'>
+                    <img src={image.imageUrl} alt={image.fileName} style={{ maxWidth: 100, maxHeight: 100 }} />
+                    <p className='m-0'>People: {image.requiredCount}</p>
                 </div>
             ))}
         </div>

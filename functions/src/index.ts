@@ -11,8 +11,8 @@ import { onRequest } from "firebase-functions/v2/https";
 import { sendWelcomeSMS } from "./lib/46elks";
 import { logger, setGlobalOptions } from "firebase-functions";
 import * as admin from 'firebase-admin';
-import { cleanNumber, ensureEnoughStaff, ensureUserExists, isValidNumber, processReply } from "./lib/logic";
-import { onDocumentWritten } from "firebase-functions/firestore";
+import { cleanNumber, ensureEnoughStaff, ensureUserExists, isValidNumber, processImage, processReply } from "./lib/logic";
+import { onDocumentCreated, onDocumentWritten } from "firebase-functions/firestore";
 
 admin.initializeApp();
 
@@ -59,3 +59,13 @@ export const onReply = onRequest({ cors: true }, async (request, response) => {
 
 export const onConfigUpdate = onDocumentWritten('config/public', () => ensureEnoughStaff());
 export const onUserWrite = onDocumentWritten('users/{userId}', () => ensureEnoughStaff());
+
+export const onNewImage = onDocumentCreated('images/{imageId}', async event => {
+    const imageData = event.data?.data();
+    const imageId = event.data?.id;
+    if (!imageData || !imageId) {
+        logger.error("No image data");
+        return;
+    }
+    await processImage(imageId, imageData.imageUrl);
+});
