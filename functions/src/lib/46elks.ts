@@ -5,7 +5,13 @@ import { User } from "../models/User";
 
 
 const WELCOME_SMS = "Welcome to Whensday! Your call sign is {name}.";
-const WE_NEED_YOUR_HELP_SMS = "PANIC! We need your help {name}, can you work now?";
+export const WE_NEED_YOUR_HELP_SMS = "PANIC! We need your help {name}, can you work now?";
+const WE_COULDNT_UNDERSTAND_SMS = "We couldn't understand your message. Can you work now?";
+
+export const sendWeCouldntUnderstandSMS = async (user: User) => {
+    logger.info("Sending we couldn't understand SMS to", { user });
+    return sendSMS(user, WE_COULDNT_UNDERSTAND_SMS);
+}
 
 export const sendWeNeedYourHelpSMS = async (user: User) => {
     logger.info("Sending we need your help SMS to", { user });

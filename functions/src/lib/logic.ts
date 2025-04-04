@@ -2,7 +2,8 @@
 import * as admin from 'firebase-admin';
 import { User } from '../models/User';
 import { logger } from 'firebase-functions';
-import { sendWeNeedYourHelpSMS } from './46elks';
+import { sendWeCouldntUnderstandSMS, sendWeNeedYourHelpSMS, WE_NEED_YOUR_HELP_SMS } from './46elks';
+import { evaluateReply } from './ai';
 
 
 export const processReply = async (number: string, message: string) => {
@@ -13,8 +14,17 @@ export const processReply = async (number: string, message: string) => {
     }
     const user = fromFirebaseDoc<User>(findUserSnap.docs[0]);
 
+    const reply = await evaluateReply(WE_NEED_YOUR_HELP_SMS, message);
+    console.log("AI reply", { reply });
+
+    if (reply.score < 50) {
+        logger.info("We are not sure what the user means", { message });
+        await sendWeCouldntUnderstandSMS(user);
+        return;
+    }
+
     const userUpdate: Partial<User> = {
-        working: message.toLowerCase() === "yes",
+        working: reply.yes || false,
     }
     await admin.firestore().collection("users").doc(user.id).update(userUpdate);
 };
