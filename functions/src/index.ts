@@ -1,0 +1,40 @@
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * import {onCall} from "firebase-functions/v2/https";
+ * import {onDocumentWritten} from "firebase-functions/v2/firestore";
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
+import { onRequest } from "firebase-functions/v2/https";
+import { sendWelcomeSMS } from "./lib/46elks";
+
+
+export const registerNewNumber = onRequest(async (request, response) => {
+    const number = request.query.number || request.body.number;
+    if (!number) {
+        response.send("No number provided");
+        return;
+    }
+    if (!isValidNumber(number)) {
+        response.send("Invalid number");
+        return;
+    }
+
+    try {
+        await sendWelcomeSMS(number)
+
+        response.send("ok");
+    } catch (error) {
+        console.error("Error sending SMS", error);
+        response.status(500).send("Error sending SMS");
+    }
+
+});
+
+const isValidNumber = (number: string) => {
+    number = number.replace(/\s+/g, '').replace(/-/g, '');
+    const regex = /^[+]?\d+$/;
+    return regex.test(number);
+}
