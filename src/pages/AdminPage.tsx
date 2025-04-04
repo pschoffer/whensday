@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Form } from 'react-bootstrap';
+import { Container, Form, Alert } from 'react-bootstrap';
 import { User } from '../models/User';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { firestore, fromFirebaseDocs } from '../lib/firebase';
@@ -9,6 +9,7 @@ import { Config } from '../models/Config';
 export default function AdminPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [requiredStaffCount, setRequiredStaffCount] = useState<number>(0);
+    
 
     useEffect(() => {
         return onSnapshot(collection(firestore, "users"), (snapshot) => {
@@ -25,6 +26,10 @@ export default function AdminPage() {
         });
     }, [])
 
+    //const updateAvailableStaffCount = (users: User[]) => {
+        const WorkingCount = users.filter(user => user.working).length;
+    //};
+
     const handleSwitchChange = async (user: User) => {
         const userUpdate: Partial<User> = {
             working: !user.working,
@@ -39,7 +44,11 @@ export default function AdminPage() {
         <Container>
             <h1>Admin Page - Registered Users</h1>
             <div className='d-flex flex-column gap-3'>
-                <h2>Required Staff Count: {requiredStaffCount}</h2>
+           
+
+                    <Alert variant={WorkingCount < requiredStaffCount ? "danger" : 'success'} className="m-0">
+                    Staff: {WorkingCount}/{requiredStaffCount}
+                    </Alert>
 
                 {users.map((user) => (
                     <div key={user.id} className='border rounded p-3  d-flex shadow'>
@@ -59,11 +68,3 @@ export default function AdminPage() {
         </Container>
     );
 }
-
-
-
-
-
-
-
-
