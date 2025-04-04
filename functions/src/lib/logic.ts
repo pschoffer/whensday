@@ -1,6 +1,31 @@
 
 import * as admin from 'firebase-admin';
 import { User } from '../models/User';
+import { logger } from 'firebase-functions';
+import { sendWeNeedYourHelpSMS } from './46elks';
+
+export const ensureEnoughStaff = async () => {
+    const configSnap = await admin.firestore().collection("config").doc("public").get();
+    const requiredStaffCount = configSnap.data()?.requiredStaffCount || 0;
+    logger.info("Ensuring enough staff", { requiredStaffCount });
+
+    const allStaffSnap = await admin.firestore().collection("users").get();
+    const allStaff = fromFirebaseDocs<User>(allStaffSnap.docs);
+
+    const workingStaff = allStaff.filter(user => user.working);
+    const workingStaffCount = workingStaff.length;
+    logger.info("Working staff count", { workingStaffCount });
+
+    if (workingStaffCount >= requiredStaffCount) {
+        logger.info("Enough staff available", { workingStaffCount });
+        return;
+    }
+    const nonWorkingStaff = allStaff.filter(user => !user.working);
+
+    for (const staff of nonWorkingStaff) {
+        await sendWeNeedYourHelpSMS(staff);
+    }
+}
 
 export const ensureUserExists = async (phone: string): Promise<User> => {
     const userSnap = await admin.firestore().collection("users").where("phone", "==", phone).get();
