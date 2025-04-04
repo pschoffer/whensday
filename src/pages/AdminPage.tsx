@@ -1,48 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import { User } from '../models/User';
+import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { firestore, fromFirebaseDocs } from '../lib/firebase';
 
-
-const usersData: User[] = [
-  { id: "1", name: "Captain Giggles", phone: "+12345678901", working: true },
-  { id: "2", name: "Sir Laughs-a-Lot", phone: "+12345678902", working: false },
-  { id: "3", name: "Duke Chuckles", phone: "+12345678903", working: true },
-  { id: "4", name: "Lady Snort", phone: "+12345678904", working: false }
-];
 
 export default function AdminPage() {
-  const [users] = useState<User[]>(usersData);
-  const handleSwitchChange = (userId: string) => {
-    // Toggle the "working" status of the user
-    // const updatedUsers = users.map(user => {
-    //   if (user.id === userId) {
-    //     return { ...user, working: !user.working };
-    //   }
-    //   return user;
-    // });
-    //setUsers(updatedUsers);
-  };
+    const [users, setUsers] = useState<User[]>([]);
 
-  return (
-    <Container>
-      <h1>Admin Page - Registered Users</h1>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            {user.name} - {user.phone}
-            <Form.Check
-                type="switch"
-                id={`switch-${user.id}`}
-              //  label={user.working ? "Working" : "Not Working"}
-                checked={user.working}
-                onChange={() => handleSwitchChange(user.id)}
-              />
-            
-          </li>
-        ))}
-      </ul>
-    </Container>
-  );
+    useEffect(() => {
+        return onSnapshot(collection(firestore, "users"), (snapshot) => {
+            const users = fromFirebaseDocs<User>(snapshot.docs);
+            setUsers(users);
+        });
+    }, [])
+
+    const handleSwitchChange = async (user: User) => {
+        const userUpdate: Partial<User> = {
+            working: !user.working,
+        };
+
+        await updateDoc(doc(firestore, "users", user.id), userUpdate);
+    };
+
+
+
+    return (
+        <Container>
+            <h1>Admin Page - Registered Users</h1>
+            <div className='d-flex flex-column gap-3'>
+
+                {users.map((user) => (
+                    <div key={user.id} className='border rounded p-3  d-flex shadow'>
+                        <div style={{ background: user.color, width: 20 }} className='me-2' />
+                        {user.name} - {user.phone}
+                        <Form.Check
+                            className='ms-auto'
+                            type="switch"
+                            id={`switch-${user.id}`}
+                            checked={user.working}
+                            onChange={() => handleSwitchChange(user)}
+                        />
+
+                    </div>
+                ))}
+            </div>
+        </Container>
+    );
 }
 
 

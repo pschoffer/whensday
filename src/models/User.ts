@@ -3,4 +3,5 @@ export interface User {
     name: string;
     phone: string;
     working: boolean;
+    color: string;
 }
