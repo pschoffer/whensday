@@ -3,13 +3,14 @@ import React, { useEffect } from 'react'
 import { Button } from 'react-bootstrap'
 import { firestore, fromFirebaseDocs, storage } from '../lib/firebase'
 import { Image } from '../models/Image'
-import { addDoc, collection, onSnapshot } from 'firebase/firestore'
+import { addDoc, collection, onSnapshot, orderBy, query } from 'firebase/firestore'
 
 export default function ImageProcessor() {
     const [images, setImages] = React.useState<Image[]>([])
 
     useEffect(() => {
-        return onSnapshot(collection(firestore, "images"), (snapshot) => {
+        const q = query(collection(firestore, "images"), orderBy('createdAt', 'desc'))
+        return onSnapshot(q, (snapshot) => {
             const images = fromFirebaseDocs<Image>(snapshot.docs)
             setImages(images)
         })
@@ -33,6 +34,7 @@ export default function ImageProcessor() {
                 imageUrl: publicUrl,
                 fileName: file.name,
                 fileType: file.type,
+                createdAt: new Date(),
             }
             await addDoc(collection(firestore, 'images'), newImage)
         }

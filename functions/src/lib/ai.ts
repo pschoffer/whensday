@@ -9,6 +9,7 @@ export const evaluatePicture = async (pictureUrl: string): Promise<PictureReply>
         name: "describe_image",
         instructions: "How many people are in the picture?",
         input: pictureUrl,
+        model: 'openai/gpt-4o',
         output_schema: {
             properties: {
                 numberPeople: {

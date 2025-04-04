@@ -3,4 +3,5 @@ export interface Image {
     fileName: string;
     fileType: string;
     requiredCount?: number;
+    createdAt: Date;
 }
