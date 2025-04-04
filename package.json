@@ -21,9 +21,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-emulators": "export REACT_APP_EMULATORS=true && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "emulators": "firebase emulators:start"
   },
   "eslintConfig": {
     "extends": [
