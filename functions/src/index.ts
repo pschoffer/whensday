@@ -11,7 +11,8 @@ import { onRequest } from "firebase-functions/v2/https";
 import { sendWelcomeSMS } from "./lib/46elks";
 import { setGlobalOptions } from "firebase-functions";
 import * as admin from 'firebase-admin';
-import { cleanNumber, ensureUserExists, isValidNumber } from "./lib/logic";
+import { cleanNumber, ensureEnoughStaff, ensureUserExists, isValidNumber } from "./lib/logic";
+import { onDocumentUpdated, onDocumentWritten } from "firebase-functions/firestore";
 
 admin.initializeApp();
 
@@ -43,3 +44,5 @@ export const registerNewNumber = onRequest({ cors: true }, async (request, respo
     }
 });
 
+export const onConfigUpdate = onDocumentWritten('config/public', () => ensureEnoughStaff());
+export const onUserWrite = onDocumentWritten('users/{userId}', () => ensureEnoughStaff());
