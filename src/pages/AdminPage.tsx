@@ -5,6 +5,7 @@ import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { firestore, fromFirebaseDocs } from '../lib/firebase';
 import { Config } from '../models/Config';
 import MessageLog from '../components/MessageLog';
+import ImageProcessor from '../components/ImageProcessor';
 
 
 export default function AdminPage() {
@@ -37,28 +38,33 @@ export default function AdminPage() {
 
     return (
         <Container>
-            <h1>Admin Page - Registered Users</h1>
-            <div className='d-flex flex-column gap-3'>
+            <h1>Admin Page</h1>
 
+            <div className='d-flex'>
 
-                <Alert variant={WorkingCount < requiredStaffCount ? "danger" : 'success'} className="m-0">
-                    Staff: {WorkingCount}/{requiredStaffCount}
-                </Alert>
+                <div className='d-flex flex-column gap-3 flex-grow-1'>
 
-                {users.map((user) => (
-                    <div key={user.id} className='border rounded p-3  d-flex shadow'>
-                        <div style={{ background: user.color, width: 20 }} className='me-2' />
-                        {user.name} - {user.phone}
-                        <Form.Check
-                            className='ms-auto'
-                            type="switch"
-                            id={`switch-${user.id}`}
-                            checked={user.working}
-                            onChange={() => handleSwitchChange(user)}
-                        />
+                    <Alert variant={WorkingCount < requiredStaffCount ? "danger" : 'success'} className="m-0">
+                        Staff: {WorkingCount}/{requiredStaffCount}
+                    </Alert>
 
-                    </div>
-                ))}
+                    {users.map((user) => (
+                        <div key={user.id} className='border rounded p-3  d-flex shadow'>
+                            <div style={{ background: user.color, width: 20 }} className='me-2' />
+                            {user.name} - {user.phone}
+                            <Form.Check
+                                className='ms-auto'
+                                type="switch"
+                                id={`switch-${user.id}`}
+                                checked={user.working}
+                                onChange={() => handleSwitchChange(user)}
+                            />
+
+                        </div>
+                    ))}
+                </div>
+
+                <ImageProcessor />
             </div>
             <MessageLog />
         </Container>

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
-import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../lib/firebase';
 
 export default function MessageLog() {
