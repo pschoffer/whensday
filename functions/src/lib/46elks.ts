@@ -15,7 +15,7 @@ export const sendWelcomeSMS = async (originalNumber: string) => {
     const dataObject = {
         from: "ElksWelcome",
         to: number,
-        message: "Highway to hell"
+        message: "Highway to hell",
     }
     const data = new URLSearchParams(dataObject);
 

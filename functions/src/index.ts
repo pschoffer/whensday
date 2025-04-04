@@ -9,9 +9,17 @@
 
 import { onRequest } from "firebase-functions/v2/https";
 import { sendWelcomeSMS } from "./lib/46elks";
+import { setGlobalOptions } from "firebase-functions";
+import * as admin from 'firebase-admin';
+
+admin.initializeApp();
+
+const region = 'europe-west1';
+
+setGlobalOptions({ region });
 
 
-export const registerNewNumber = onRequest(async (request, response) => {
+export const registerNewNumber = onRequest({ cors: true }, async (request, response) => {
     const number = request.query.number || request.body.number;
     if (!number) {
         response.send("No number provided");
@@ -30,7 +38,6 @@ export const registerNewNumber = onRequest(async (request, response) => {
         console.error("Error sending SMS", error);
         response.status(500).send("Error sending SMS");
     }
-
 });
 
 const isValidNumber = (number: string) => {
